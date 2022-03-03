@@ -3,14 +3,20 @@ use std::fs;
 pub struct Config {
     pub filename: String,
     pub query: String,
+    pub info: bool,
 }
 
 impl Config {
     pub fn new(args: &[String]) -> Config {
         let filename = args[1].clone();
         let query = args[2].clone();
+        let mut info = false;
 
-        Config { filename, query }
+        if args.contains(&"-info".to_string()) {
+            info = true;
+        }
+
+        Config { filename, query, info }
     }
 }
 
@@ -32,7 +38,12 @@ pub fn run(config: Config) {
     let results = search(&config.query, &content);
 
     for result in results {
-        println!("Line: {}, Result: {}", result.number_line, result.line);
+        if config.info {
+            println!("Line: {}, Result: {}", result.number_line, result.line);
+        } else {
+            println!("{}", result.line);
+        }
+
     }
 }
 
