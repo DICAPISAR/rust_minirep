@@ -14,23 +14,37 @@ impl Config {
     }
 }
 
-pub fn run(config: Config) {
-    let content = fs::read_to_string(config.filename).expect("Ocurrio un error al leer el archivo");
-    let found = search(&config.query, &content);
+struct Result {
+    number_line: String,
+    line: String,
+}
 
-    for line in found {
-        println!("{}", line);
+impl Result {
+    fn new(number_line: String, line: String) -> Result {
+        let n = number_line.clone();
+        let l = line.clone();
+        Result {number_line: n, line: l}
     }
 }
 
-fn search<'a>(query: &str, content: &'a str) -> Vec<&'a str> {
-    let mut result = Vec::new();
+pub fn run(config: Config) {
+    let content = fs::read_to_string(config.filename).expect("Ocurrio un error al leer el archivo");
+    let results = search(&config.query, &content);
 
-    for line in content.lines() {
-        if line.contains(query) {
-            result.push(line);
+    for result in results {
+        println!("Line: {}, Result: {}", result.number_line, result.line);
+    }
+}
+
+fn search(query: &str, content: &str) -> Vec<Result> {
+    let mut results = Vec::new();
+
+    for (i, l) in content.lines().enumerate() {
+        if l.contains(query) {
+            let result = Result::new((i+1).to_string(), l.to_string());
+            results.push(result);
         }
     }
 
-    result
+    results
 }
